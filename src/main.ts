@@ -2,6 +2,10 @@ import Map from "@arcgis/core/Map";
 import { when } from "@arcgis/core/core/reactiveUtils";
 import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 import SceneView from "@arcgis/core/views/SceneView";
+import SimpleRenderer from "@arcgis/core/renderers/SimpleRenderer";
+import WebStyleSymbol from "@arcgis/core/symbols/WebStyleSymbol";
+import { LineSymbol3D, PathSymbol3DLayer } from "@arcgis/core/symbols";
+import { UniqueValueRenderer } from "@arcgis/core/renderers";
 
 
 const treesUrl = "https://services2.arcgis.com/jUpNdisbWqRpMo35/ArcGIS/rest/services/Baumkataster_Berlin/FeatureServer/0/";
@@ -41,10 +45,10 @@ const view = new SceneView({
   },
 });
 
-// view.when().then(() => {
-//   view.watch("camera", (c) => console.log(JSON.stringify(c)));
-// });
 
+/**************************************************
+ * Step 2 - Add a trees layer with a web style symbol *
+ **************************************************/
 
 const treesLayer = new FeatureLayer({
   title: "Berlin trees",
@@ -53,8 +57,52 @@ const treesLayer = new FeatureLayer({
   outFields: ["*"],
   elevationInfo: {
     mode: "on-the-ground",
-  }
+  },
+  renderer: new SimpleRenderer({
+    symbol: new WebStyleSymbol({
+      name: "Populus",
+      styleName: "EsriRealisticTreesStyle",
+    }),
+  }),
 });
+
+/**************************************************
+ * Step 3 - Change the streets renderer to show a 3D line *
+ **************************************************/
+const FEMALE_COLOR = "#8400a8";
+const MALE_COLOR = "#e6bc01";
+
+const femaleStreetSymbol = {
+  value: "F",
+  symbol: new LineSymbol3D({
+    symbolLayers: [
+      new PathSymbol3DLayer({
+        profile: "quad",
+        material: {
+          color: FEMALE_COLOR,
+        },
+        width: 10,
+        height: 3,
+      }),
+    ],
+  }),
+};
+
+const maleStreetSymbol = {
+  value: "M",
+  symbol: new LineSymbol3D({
+    symbolLayers: [
+      new PathSymbol3DLayer({
+        profile: "quad",
+        material: {
+          color: MALE_COLOR,
+        },
+        width: 10,
+        height: 3,
+      }),
+    ],
+  }),
+};
 
 const streetsLayer = new FeatureLayer({
   title: "Berlin streets",
@@ -62,7 +110,11 @@ const streetsLayer = new FeatureLayer({
   outFields: ["*"],
   elevationInfo: {
     mode: "on-the-ground",
-  }
+  },
+  renderer: new UniqueValueRenderer({
+    field: "gender",
+    uniqueValueInfos: [femaleStreetSymbol, maleStreetSymbol],
+  }),
 });
 
 const districtsLayer = new FeatureLayer({
