@@ -4,10 +4,12 @@ import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 import SceneView from "@arcgis/core/views/SceneView";
 import SimpleRenderer from "@arcgis/core/renderers/SimpleRenderer";
 import WebStyleSymbol from "@arcgis/core/symbols/WebStyleSymbol";
-import { FillSymbol3DLayer, LabelSymbol3D, LineSymbol3D, ObjectSymbol3DLayer, PathSymbol3DLayer, PointSymbol3D, PolygonSymbol3D, TextSymbol3DLayer } from "@arcgis/core/symbols";
+import { FillSymbol3DLayer, LabelSymbol3D, LineSymbol3D, MeshSymbol3D, ObjectSymbol3DLayer, PathSymbol3DLayer, PointSymbol3D, PolygonSymbol3D, TextSymbol3DLayer } from "@arcgis/core/symbols";
 import { UniqueValueRenderer } from "@arcgis/core/renderers";
 import LineStylePattern3D from "@arcgis/core/symbols/patterns/LineStylePattern3D";
 import LineCallout3D from "@arcgis/core/symbols/callouts/LineCallout3D";
+import SolidEdges3D from "@arcgis/core/symbols/edges/SolidEdges3D";
+import SceneLayer from "@arcgis/core/layers/SceneLayer";
 
 
 const treesUrl = "https://services2.arcgis.com/jUpNdisbWqRpMo35/ArcGIS/rest/services/Baumkataster_Berlin/FeatureServer/0/";
@@ -24,7 +26,7 @@ const buildingsUrl = "https://tiles.arcgis.com/tiles/P3ePLMYs2RVChkJx/arcgis/res
  ********************************************************************/
 
 const map = new Map({
-  basemap: "topo-3d",
+  basemap: "dark-gray-vector",
   ground: "world-elevation",
 });
 
@@ -203,7 +205,42 @@ const districtsLabelLayer = new FeatureLayer({
   }),
 });
 
-map.addMany([districtsLabelLayer, districtsLayer, streetsLayer, treesLayer]);
+
+/**************************************************
+ * Step 5 - Add 3D buildings with edges rendering *
+ **************************************************/
+
+const buildingSymbol = new MeshSymbol3D({
+  symbolLayers: [
+    new FillSymbol3DLayer({
+      material: {
+        color: [40, 40, 40, 0.5],
+        colorMixMode: "tint",
+      },
+      edges: new SolidEdges3D({
+        size: 0.5,
+        color: [255, 255, 255, 0.5],
+      }),
+    }),
+  ],
+});
+
+const buildingsLayer = new SceneLayer({
+  title: "Berlin 3D buildings",
+  url: buildingsUrl,
+  outFields: ["*"],
+  renderer: new SimpleRenderer({
+    symbol: buildingSymbol,
+  }),
+  legendEnabled: false,
+});
+
+map.addMany([buildingsLayer, districtsLabelLayer, districtsLayer, streetsLayer, treesLayer]);
+
+
+
+
+
 
 
 view.whenLayerView(streetsLayer).then((layerView) => {
