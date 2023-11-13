@@ -4,7 +4,17 @@ import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 import SceneView from "@arcgis/core/views/SceneView";
 import SimpleRenderer from "@arcgis/core/renderers/SimpleRenderer";
 import WebStyleSymbol from "@arcgis/core/symbols/WebStyleSymbol";
-import { FillSymbol3DLayer, LabelSymbol3D, LineSymbol3D, MeshSymbol3D, ObjectSymbol3DLayer, PathSymbol3DLayer, PointSymbol3D, PolygonSymbol3D, TextSymbol3DLayer } from "@arcgis/core/symbols";
+import {
+  FillSymbol3DLayer,
+  LabelSymbol3D,
+  LineSymbol3D,
+  MeshSymbol3D,
+  ObjectSymbol3DLayer,
+  PathSymbol3DLayer,
+  PointSymbol3D,
+  PolygonSymbol3D,
+  TextSymbol3DLayer,
+} from "@arcgis/core/symbols";
 import { UniqueValueRenderer } from "@arcgis/core/renderers";
 import LineStylePattern3D from "@arcgis/core/symbols/patterns/LineStylePattern3D";
 import LineCallout3D from "@arcgis/core/symbols/callouts/LineCallout3D";
@@ -12,16 +22,22 @@ import SolidEdges3D from "@arcgis/core/symbols/edges/SolidEdges3D";
 import SceneLayer from "@arcgis/core/layers/SceneLayer";
 import PopupTemplate from "@arcgis/core/PopupTemplate";
 import ExpressionInfo from "@arcgis/core/form/ExpressionInfo";
+import Search from "@arcgis/core/widgets/Search";
+import Home from "@arcgis/core/widgets/Home";
+import LayerList from "@arcgis/core/widgets/LayerList";
+import Expand from "@arcgis/core/widgets/Expand";
 
+const treesUrl =
+  "https://services2.arcgis.com/jUpNdisbWqRpMo35/ArcGIS/rest/services/Baumkataster_Berlin/FeatureServer/0/";
 
-const treesUrl = "https://services2.arcgis.com/jUpNdisbWqRpMo35/ArcGIS/rest/services/Baumkataster_Berlin/FeatureServer/0/";
+const streetsUrl =
+  "https://services2.arcgis.com/cFEFS0EWrhfDeVw9/arcgis/rest/services/Berlin_Equal_Street_Names/FeatureServer";
 
-const streetsUrl = "https://services2.arcgis.com/cFEFS0EWrhfDeVw9/arcgis/rest/services/Berlin_Equal_Street_Names/FeatureServer";
+const districtsUrl =
+  "https://services2.arcgis.com/jUpNdisbWqRpMo35/arcgis/rest/services/BerlinRBS_Ortsteile_2017/FeatureServer";
 
-const districtsUrl = "https://services2.arcgis.com/jUpNdisbWqRpMo35/arcgis/rest/services/BerlinRBS_Ortsteile_2017/FeatureServer";
-
-const buildingsUrl = "https://tiles.arcgis.com/tiles/P3ePLMYs2RVChkJx/arcgis/rest/services/Buildings_Berlin/SceneServer";
-
+const buildingsUrl =
+  "https://tiles.arcgis.com/tiles/P3ePLMYs2RVChkJx/arcgis/rest/services/Buildings_Berlin/SceneServer";
 
 /********************************************************************
  * Step 1 - Add scene with basemap *
@@ -50,7 +66,6 @@ const view = new SceneView({
     starsEnabled: false,
   },
 });
-
 
 /**************************************************
  * Step 2 - Add a trees layer with a web style symbol *
@@ -122,8 +137,6 @@ const streetsLayer = new FeatureLayer({
     uniqueValueInfos: [femaleStreetSymbol, maleStreetSymbol],
   }),
 });
-
-
 
 /**************************************************
  * Step 4 - Add districts and 3D labels *
@@ -207,7 +220,6 @@ const districtsLabelLayer = new FeatureLayer({
   }),
 });
 
-
 /**************************************************
  * Step 5 - Add 3D buildings with edges rendering *
  **************************************************/
@@ -237,8 +249,13 @@ const buildingsLayer = new SceneLayer({
   legendEnabled: false,
 });
 
-map.addMany([buildingsLayer, districtsLabelLayer, districtsLayer, streetsLayer, treesLayer]);
-
+map.addMany([
+  buildingsLayer,
+  districtsLabelLayer,
+  districtsLayer,
+  streetsLayer,
+  treesLayer,
+]);
 
 /**************************************************
  * Step 6 - Add a popup with the name & description of the street *
@@ -270,6 +287,35 @@ streetsLayer.popupTemplate = new PopupTemplate({
   ) as __esri.popupExpressionInfoProperties[],
 });
 
+/**************************************************
+ * Step 7 - Find a widget in the docs to add to your app *
+ **************************************************/
+
+new Search({
+  container: "search-widget-container",
+  view: view,
+});
+
+let homeWidget = new Home({
+  view: view,
+});
+view.ui.add(homeWidget, "top-left");
+
+const layerList = new LayerList({
+  view: view,
+  listItemCreatedFunction: (event) => {
+    const item = event.item;
+    if (item.layer.type != "group") {
+      item.panel = { content: "legend", open: true };
+    }
+  },
+});
+const llExpand = new Expand({
+  view: view,
+  content: layerList,
+  expanded: false,
+});
+view.ui.add(llExpand, "top-right");
 
 
 
@@ -284,7 +330,7 @@ view.whenLayerView(streetsLayer).then((layerView) => {
       const results = await layerView.queryFeatures({
         geometry: view.extent,
       });
-      console.log('query results', Date.now(), results);
+      console.log("query results", Date.now(), results);
     }
-  )
+  );
 });
