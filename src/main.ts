@@ -1,5 +1,16 @@
 import Map from "@arcgis/core/Map";
+import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 import SceneView from "@arcgis/core/views/SceneView";
+
+
+const treesUrl = "https://services2.arcgis.com/jUpNdisbWqRpMo35/ArcGIS/rest/services/Baumkataster_Berlin/FeatureServer/0/";
+
+const streetsUrl = "https://services2.arcgis.com/cFEFS0EWrhfDeVw9/arcgis/rest/services/Berlin_Equal_Street_Names/FeatureServer";
+
+const districtsUrl = "https://services2.arcgis.com/jUpNdisbWqRpMo35/arcgis/rest/services/BerlinRBS_Ortsteile_2017/FeatureServer";
+
+const buildingsUrl = "https://tiles.arcgis.com/tiles/P3ePLMYs2RVChkJx/arcgis/rest/services/Buildings_Berlin/SceneServer";
+
 
 /********************************************************************
  * Step 1 - Add scene with basemap *
@@ -12,8 +23,6 @@ const map = new Map({
 
 const view = new SceneView({
   container: document.querySelector("#app") as HTMLDivElement,
-  center: [13.405, 52.52],
-  scale: 50000,
   map: map,
   camera: {
     position: {
@@ -34,3 +43,34 @@ const view = new SceneView({
 // view.when().then(() => {
 //   view.watch("camera", (c) => console.log(JSON.stringify(c)));
 // });
+
+
+const treesLayer = new FeatureLayer({
+  title: "Berlin trees",
+  minScale: 5000,
+  url: treesUrl,
+  outFields: ["*"],
+  elevationInfo: {
+    mode: "on-the-ground",
+  }
+});
+
+const streetsLayer = new FeatureLayer({
+  title: "Berlin streets",
+  url: streetsUrl,
+  outFields: ["*"],
+  elevationInfo: {
+    mode: "on-the-ground",
+  }
+});
+
+const districtsLayer = new FeatureLayer({
+  title: "Berlin district boundaries",
+  url: districtsUrl,
+  outFields: ["*"],
+  elevationInfo: {
+    mode: "on-the-ground",
+  }
+});
+
+map.addMany([districtsLayer, streetsLayer, treesLayer]);
