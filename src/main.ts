@@ -46,35 +46,7 @@ const districtsUrl =
 const buildingsUrl =
   "https://tiles.arcgis.com/tiles/P3ePLMYs2RVChkJx/arcgis/rest/services/Buildings_Berlin/SceneServer";
 
-/********************************************************************
- * Step 1 - Add scene with basemap *
- ********************************************************************/
-
-// const map = new Map({
-//   basemap: "dark-gray-vector",
-//   ground: "world-elevation",
-// });
-
-// const view = new SceneView({
-//   container: document.querySelector("#app") as HTMLDivElement,
-//   map: map,
-//   camera: {
-//     position: {
-//       spatialReference: { latestWkid: 3857, wkid: 102100 },
-//       x: 1491506.456761522,
-//       y: 6892221.1440706095,
-//       z: 449.1962412856519,
-//     },
-//     heading: 331.4896155794407,
-//     tilt: 63.80679107867683,
-//   },
-//   environment: {
-//     atmosphereEnabled: false,
-//     starsEnabled: false,
-//   },
-// });
-
-
+  
 /********************************************************************
  * Step 9 - grab handle from Web Components *
  ********************************************************************/
