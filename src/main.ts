@@ -74,6 +74,24 @@ const buildingsUrl =
 //   },
 // });
 
+
+/********************************************************************
+ * Step 9 - grab handle from Web Components *
+ ********************************************************************/
+
+let map: Map;
+let view: SceneView;
+
+document
+  .querySelector("arcgis-scene")
+  ?.addEventListener("viewReady", async (event) => {
+    view = event.detail.view;
+    map = view.map;
+    console.log(`Got view and map from the DOM`, view, map);
+
+    initApp();
+  });
+
 const initApp = () => {
   /**************************************************
    * Step 2 - Add a trees layer with a web style symbol *
