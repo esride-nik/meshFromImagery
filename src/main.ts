@@ -76,7 +76,7 @@ const districtsLayer = new FeatureLayer({
 
 map.addMany([districtsLayer, streetsLayer, treesLayer]);
 
-view.whenLayerView(streetsLayer).then((layerView: __esri.FeatureLayerView) => {
+view.whenLayerView(streetsLayer).then((layerView) => {
   when(
     // Update the chart whenever the user is not interacting with the scene
     () => !layerView.updating,
@@ -85,7 +85,7 @@ view.whenLayerView(streetsLayer).then((layerView: __esri.FeatureLayerView) => {
       const results = await layerView.queryFeatures({
         geometry: view.extent,
       });
-      console.log('query results', results);
+      console.log('query results', Date.now(), results);
     }
   )
 });
