@@ -26,6 +26,7 @@ import Search from "@arcgis/core/widgets/Search";
 import Home from "@arcgis/core/widgets/Home";
 import LayerList from "@arcgis/core/widgets/LayerList";
 import Expand from "@arcgis/core/widgets/Expand";
+import { Chart, registerables } from "chart.js";
 
 const treesUrl =
   "https://services2.arcgis.com/jUpNdisbWqRpMo35/ArcGIS/rest/services/Baumkataster_Berlin/FeatureServer/0/";
@@ -319,6 +320,36 @@ view.ui.add(llExpand, "top-right");
 
 
 
+/**************************************************
+ * Step 8 - Add a chart that shows the distribution of the streets by gender *
+ **************************************************/
+Chart.register(...registerables);
+
+let femaleStreetsCounts = 0;
+let maleStreetsCount = 0;
+
+const chartCanvas = document.getElementById(
+  "chart-canvas"
+) as HTMLCanvasElement;
+
+const chart = new Chart(chartCanvas, {
+  type: "doughnut",
+  data: {
+    labels: ["Female", "Male"],
+    datasets: [
+      {
+        label: "Zurich streets by gender",
+        data: [femaleStreetsCounts, maleStreetsCount],
+        backgroundColor: [FEMALE_COLOR, MALE_COLOR],
+        borderColor: [FEMALE_COLOR, MALE_COLOR],
+        hoverOffset: 4,
+      },
+    ],
+  },
+});
+
+// set default chart font color to white
+Chart.defaults.color = "#fff";
 
 
 view.whenLayerView(streetsLayer).then((layerView) => {
@@ -330,7 +361,18 @@ view.whenLayerView(streetsLayer).then((layerView) => {
       const results = await layerView.queryFeatures({
         geometry: view.extent,
       });
-      console.log("query results", Date.now(), results);
+      
+      const graphics = results.features;
+      femaleStreetsCounts = graphics.filter(
+        (street) => street.attributes.gender === "F"
+      ).length;
+      maleStreetsCount = graphics.filter(
+        (street) => street.attributes.gender === "M"
+      ).length;
+
+      // update chart
+      chart.data.datasets[0].data = [femaleStreetsCounts, maleStreetsCount];
+      chart.update();
     }
   );
 });
