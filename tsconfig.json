@@ -19,5 +19,5 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src"]
+  "include": ["./src/**/*", "./node_modules/@arcgis/core/**/*.d.ts"]
 }
