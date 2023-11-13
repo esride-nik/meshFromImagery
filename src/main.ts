@@ -4,8 +4,10 @@ import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 import SceneView from "@arcgis/core/views/SceneView";
 import SimpleRenderer from "@arcgis/core/renderers/SimpleRenderer";
 import WebStyleSymbol from "@arcgis/core/symbols/WebStyleSymbol";
-import { LineSymbol3D, PathSymbol3DLayer } from "@arcgis/core/symbols";
+import { FillSymbol3DLayer, LabelSymbol3D, LineSymbol3D, ObjectSymbol3DLayer, PathSymbol3DLayer, PointSymbol3D, PolygonSymbol3D, TextSymbol3DLayer } from "@arcgis/core/symbols";
 import { UniqueValueRenderer } from "@arcgis/core/renderers";
+import LineStylePattern3D from "@arcgis/core/symbols/patterns/LineStylePattern3D";
+import LineCallout3D from "@arcgis/core/symbols/callouts/LineCallout3D";
 
 
 const treesUrl = "https://services2.arcgis.com/jUpNdisbWqRpMo35/ArcGIS/rest/services/Baumkataster_Berlin/FeatureServer/0/";
@@ -117,16 +119,92 @@ const streetsLayer = new FeatureLayer({
   }),
 });
 
+
+
+/**************************************************
+ * Step 4 - Add districts and 3D labels *
+ **************************************************/
+
 const districtsLayer = new FeatureLayer({
   title: "Berlin district boundaries",
   url: districtsUrl,
   outFields: ["*"],
   elevationInfo: {
     mode: "on-the-ground",
-  }
+  },
+  renderer: new SimpleRenderer({
+    symbol: new PolygonSymbol3D({
+      symbolLayers: [
+        new FillSymbol3DLayer({
+          outline: {
+            color: "white",
+            size: "2px",
+            pattern: new LineStylePattern3D({
+              style: "dash",
+            }),
+            patternCap: "round",
+          },
+        }),
+      ],
+    }),
+  }),
 });
 
-map.addMany([districtsLayer, streetsLayer, treesLayer]);
+const districtsLabelLayer = new FeatureLayer({
+  title: "Berlin district names",
+  url: districtsUrl,
+  outFields: ["*"],
+  elevationInfo: {
+    mode: "relative-to-scene",
+  },
+  labelingInfo: [
+    {
+      labelExpression: "[name]",
+      symbol: new LabelSymbol3D({
+        symbolLayers: [
+          new TextSymbol3DLayer({
+            material: {
+              color: "white",
+            },
+            halo: {
+              size: 1,
+              color: [50, 50, 50],
+            },
+            size: 10,
+          }),
+        ],
+      }),
+    },
+  ],
+  renderer: new SimpleRenderer({
+    symbol: new PointSymbol3D({
+      symbolLayers: [
+        new ObjectSymbol3DLayer({
+          width: 1,
+          height: 1,
+          depth: 1,
+          resource: { primitive: "sphere" },
+          material: { color: "white" },
+        }),
+      ],
+      verticalOffset: {
+        screenLength: 100,
+        maxWorldLength: 200,
+        minWorldLength: 100,
+      },
+      callout: new LineCallout3D({
+        size: 1.5,
+        color: [150, 150, 150],
+        border: {
+          color: [50, 50, 50],
+        },
+      }),
+    }),
+  }),
+});
+
+map.addMany([districtsLabelLayer, districtsLayer, streetsLayer, treesLayer]);
+
 
 view.whenLayerView(streetsLayer).then((layerView) => {
   when(
