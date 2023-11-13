@@ -1,4 +1,5 @@
 import Map from "@arcgis/core/Map";
+import { when } from "@arcgis/core/core/reactiveUtils";
 import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 import SceneView from "@arcgis/core/views/SceneView";
 
@@ -74,3 +75,17 @@ const districtsLayer = new FeatureLayer({
 });
 
 map.addMany([districtsLayer, streetsLayer, treesLayer]);
+
+view.whenLayerView(streetsLayer).then((layerView: __esri.FeatureLayerView) => {
+  when(
+    // Update the chart whenever the user is not interacting with the scene
+    () => !layerView.updating,
+    async () => {
+      // Query the features
+      const results = await layerView.queryFeatures({
+        geometry: view.extent,
+      });
+      console.log('query results', results);
+    }
+  )
+});
