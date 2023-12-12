@@ -182,29 +182,34 @@ const debouncedUpdate = promiseUtils.debounce(
     console.log("pixelData", pixelData);
 
     updateChart(pixelData.pixelBlock.pixels as number[][]);
-
-    const volGraphics: Graphic[] = [];
-    const poly0 = create3dMesh(
-      pixelData,
-      pixelData.pixelBlock.pixels[0] as number[],
-      "#FFD700"
-    );
-    volGraphics.push(...poly0);
-
-    const poly1 = create3dMesh(
-      pixelData,
-      pixelData.pixelBlock.pixels[1] as number[],
-      "#D700FF"
-    );
-    volGraphics.push(...poly1);
-
-    volGraphicsLayer.addMany(volGraphics);
-    view.goTo({
-      target: poly0,
-      tilt: 80
-    });
+    createGraphics(pixelData);
   }
 );
+
+const createGraphics = (pixelData: __esri.PixelData) => {
+  volGraphicsLayer.removeAll();
+
+  const volGraphics: Graphic[] = [];
+  const poly0 = create3dMesh(
+    pixelData,
+    pixelData.pixelBlock.pixels[0] as number[],
+    "#FFD700"
+  );
+  volGraphics.push(...poly0);
+
+  const poly1 = create3dMesh(
+    pixelData,
+    pixelData.pixelBlock.pixels[1] as number[],
+    "#D700FF"
+  );
+  volGraphics.push(...poly1);
+
+  volGraphicsLayer.addMany(volGraphics);
+  view.goTo({
+    target: poly0,
+    tilt: 80
+  });
+}
 
 const getLowPolyTriangle = (
   allPoints: number[][][],
