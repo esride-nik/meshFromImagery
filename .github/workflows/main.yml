@@ -57,5 +57,4 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v2
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
+          token: ${{ secrets.GITHUB_TOKEN }}
