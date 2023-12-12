@@ -181,7 +181,7 @@ const debouncedUpdate = promiseUtils.debounce(
     console.log("resolution", resolutionX, resolutionY);
     console.log("pixelData", pixelData);
 
-    updateChart(pixelData.pixelBlock.pixels);
+    updateChart(pixelData.pixelBlock.pixels as number[][]);
 
     const volGraphics: Graphic[] = [];
     const poly0 = create3dMesh(
@@ -199,6 +199,10 @@ const debouncedUpdate = promiseUtils.debounce(
     volGraphics.push(...poly1);
 
     volGraphicsLayer.addMany(volGraphics);
+    view.goTo({
+      target: poly0,
+      tilt: 80
+    });
   }
 );
 
@@ -323,6 +327,7 @@ const create3dMesh = (
   const allPoints: number[][][] = [];
   const zAdd = -1200;
 
+  // TODO: figure out raster size: rasterinfo provides pixel size from LoD 5, but from which LoD am I getting the data?
   // imgLayerRasterSizeX
   // imgLayerRasterSizeY
 
