@@ -9,19 +9,6 @@ import ImageryLayer from '@arcgis/core/layers/ImageryLayer';
 import { defineCustomElements as defineMapElements } from "@arcgis/map-components/dist/loader";
 defineMapElements();
 
-const treesUrl =
-  "https://services2.arcgis.com/jUpNdisbWqRpMo35/ArcGIS/rest/services/Baumkataster_Berlin/FeatureServer/0/";
-
-const streetsUrl =
-  "https://services2.arcgis.com/cFEFS0EWrhfDeVw9/arcgis/rest/services/Berlin_Equal_Street_Names/FeatureServer";
-
-const districtsUrl =
-  "https://services2.arcgis.com/jUpNdisbWqRpMo35/arcgis/rest/services/BerlinRBS_Ortsteile_2017/FeatureServer";
-
-const buildingsUrl =
-  "https://tiles.arcgis.com/tiles/P3ePLMYs2RVChkJx/arcgis/rest/services/Buildings_Berlin/SceneServer";
-
-
 let map: Map;
 let view: SceneView;
 let imageryLayer: ImageryLayer;
@@ -40,17 +27,18 @@ document
 
   const setupView = () => {
 
-    const clippingAdd = 100;
-    const extentAdd = 1000;
-    view.viewingMode = "local";
-    view.clippingArea = {
-        spatialReference: { latestWkid: 3857, wkid: 102100 } as unknown as __esri.SpatialReference,
-        xmin: -4891786.441670591 - clippingAdd,
-        ymin: -2307257.926811594 - clippingAdd,
-        xmax: -4891427.934010591 + clippingAdd,
-        ymax: -2306963.3097615945 + clippingAdd,
-      } as unknown as __esri.Extent;
+    // TODO: local only works on init :/
+    // const clippingAdd = 100;
+    // view.viewingMode = "local";
+    // view.clippingArea = {
+    //     spatialReference: { latestWkid: 3857, wkid: 102100 } as unknown as __esri.SpatialReference,
+    //     xmin: -4891786.441670591 - clippingAdd,
+    //     ymin: -2307257.926811594 - clippingAdd,
+    //     xmax: -4891427.934010591 + clippingAdd,
+    //     ymax: -2306963.3097615945 + clippingAdd,
+    //   } as unknown as __esri.Extent;
 
+    const extentAdd = 1000;
     view.extent = {
         spatialReference: { latestWkid: 3857, wkid: 102100 } as unknown as __esri.SpatialReference,
         xmin: -4_891_786.441_670_591 - extentAdd,
