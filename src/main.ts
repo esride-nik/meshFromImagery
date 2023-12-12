@@ -6,14 +6,12 @@ import Map from "@arcgis/core/Map";
 import SceneView from "@arcgis/core/views/SceneView";
 import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
 import ImageryTileLayer from "@arcgis/core/layers/ImageryTileLayer";
-import { when } from "@arcgis/core/core/reactiveUtils";
 import { Chart, registerables } from "chart.js";
 
 // Web Component Imports
 // import { defineCustomElements as defineCalciteElements } from "@esri/calcite-components/dist/loader";
 // import { defineCustomElements as defineCodingElements } from "@arcgis/coding-components/dist/loader";
 import { defineCustomElements as defineMapElements } from "@arcgis/map-components/dist/loader";
-import Camera from "@arcgis/core/Camera";
 defineMapElements();
 
 let map: Map;
@@ -95,11 +93,13 @@ const addLayers = async () => {
   volGraphicsLayer.elevationInfo = currentElevationInfo;
 
   view.map.addMany([imgLayer, volGraphicsLayer]);
-  const ilv: __esri.LayerView = await view.whenLayerView(imgLayer);
-  setupImgLayer(ilv);
+
+  // TODO: can I get rasterInfo from the layerView of imgLayer?
+  // const ilv: __esri.LayerView = await view.whenLayerView(imgLayer);
+  setupImgLayer();
 };
 
-const setupImgLayer = (ilv: __esri.LayerView) => {
+const setupImgLayer = () => {
   imgLayerRasterSizeX = imgLayer?.rasterInfo?.pixelSize?.x;
   imgLayerRasterSizeY = imgLayer?.rasterInfo?.pixelSize?.y;
 
@@ -127,9 +127,9 @@ const setupImgLayer = (ilv: __esri.LayerView) => {
     useGamma: false,
     stretchType: "min-max",
     type: "raster-stretch",
-  };
+  } as unknown as __esri.RasterStretchRenderer;
 
-  view.on(["click"], (event: any) => {
+  view.on('click', (event: any) => {
     debouncedUpdate(event).catch((error: any) => {
       console.error(error);
       if (!promiseUtils.isAbortError(error)) {
