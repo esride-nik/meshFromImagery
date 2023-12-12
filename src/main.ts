@@ -1,11 +1,13 @@
-import * as promiseUtils from '@arcgis/core/core/promiseUtils';
-import Extent from '@arcgis/core/geometry/Extent';
-import Mesh from '@arcgis/core/geometry/Mesh';
-import Graphic from '@arcgis/core/Graphic';
+import * as promiseUtils from "@arcgis/core/core/promiseUtils";
+import Extent from "@arcgis/core/geometry/Extent";
+import Mesh from "@arcgis/core/geometry/Mesh";
+import Graphic from "@arcgis/core/Graphic";
 import Map from "@arcgis/core/Map";
 import SceneView from "@arcgis/core/views/SceneView";
 import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
 import ImageryTileLayer from "@arcgis/core/layers/ImageryTileLayer";
+import { when } from "@arcgis/core/core/reactiveUtils";
+import { Chart, registerables } from "chart.js";
 
 // Web Component Imports
 // import { defineCustomElements as defineCalciteElements } from "@esri/calcite-components/dist/loader";
@@ -20,6 +22,7 @@ let imgLayer: ImageryTileLayer;
 let volGraphicsLayer: GraphicsLayer;
 let imgLayerRasterSizeX: number;
 let imgLayerRasterSizeY: number;
+let chart: Chart;
 
 document
   .querySelector("arcgis-scene")
@@ -82,12 +85,12 @@ const addLayers = async () => {
 
   // Define elevationInfo and set it on the layer
   const currentElevationInfo = {
-    mode: 'relative-to-ground',
+    mode: "relative-to-ground",
     // offset: -1200,
     // featureExpressionInfo: {
     //   expression: 'Geometry($feature).z * 0.5',
     // },
-    unit: 'meters',
+    unit: "meters",
   } as unknown as __esri.GraphicsLayerElevationInfo;
   volGraphicsLayer.elevationInfo = currentElevationInfo;
 
@@ -96,18 +99,16 @@ const addLayers = async () => {
   setupImgLayer(ilv);
 };
 
-
 const setupImgLayer = (ilv: __esri.LayerView) => {
   imgLayerRasterSizeX = imgLayer?.rasterInfo?.pixelSize?.x;
   imgLayerRasterSizeY = imgLayer?.rasterInfo?.pixelSize?.y;
 
   console.log(
-    'LayerView for imagery created!',
+    "LayerView for imagery created!",
     imgLayer,
     imgLayerRasterSizeX,
     imgLayerRasterSizeY
   );
-
 
   imgLayer.renderer = {
     computeGamma: false,
@@ -124,11 +125,11 @@ const setupImgLayer = (ilv: __esri.LayerView) => {
       ],
     ],
     useGamma: false,
-    stretchType: 'min-max',
-    type: 'raster-stretch',
+    stretchType: "min-max",
+    type: "raster-stretch",
   };
 
-  view.on(['click'], (event: any) => {
+  view.on(["click"], (event: any) => {
     debouncedUpdate(event).catch((error: any) => {
       console.error(error);
       if (!promiseUtils.isAbortError(error)) {
@@ -136,7 +137,7 @@ const setupImgLayer = (ilv: __esri.LayerView) => {
       }
     });
   });
-}
+};
 
 const debouncedUpdate = promiseUtils.debounce(
   async (event: __esri.ViewClickEvent) => {
@@ -177,21 +178,23 @@ const debouncedUpdate = promiseUtils.debounce(
 
     // ImageryTileLayer will fetch pixels from nearest raster data source level based on the requested resolution.
     // Similarly, you can calculate the width and height needed for 0.6meter resolution.
-    console.log('resolution', resolutionX, resolutionY);
-    console.log('pixelData', pixelData);
+    console.log("resolution", resolutionX, resolutionY);
+    console.log("pixelData", pixelData);
+
+    updateChart(pixelData.pixelBlock.pixels);
 
     const volGraphics: Graphic[] = [];
     const poly0 = create3dMesh(
       pixelData,
       pixelData.pixelBlock.pixels[0] as number[],
-      '#FFD700'
+      "#FFD700"
     );
     volGraphics.push(...poly0);
 
     const poly1 = create3dMesh(
       pixelData,
       pixelData.pixelBlock.pixels[1] as number[],
-      '#D700FF'
+      "#D700FF"
     );
     volGraphics.push(...poly1);
 
@@ -265,7 +268,7 @@ const getLowPolyTriangle = (
             `${yIndex + 1}.${xIndex}`,
             `${yIndex + 1}.${xIndex + 2}`,
           ];
-    console.log(xIndex, indices.join(', '));
+    console.log(xIndex, indices.join(", "));
   }
   return triangle;
 };
@@ -305,7 +308,7 @@ const getTriangle = (
       `${yIndex + 1}.${xIndex}`,
       `${yIndex + 1}.${xIndex + 1}`,
     ];
-    console.log(xIndex, indices.join(', '));
+    console.log(xIndex, indices.join(", "));
   }
   return triangle;
 };
@@ -362,16 +365,16 @@ const create3dMesh = (
       },
     }),
     symbol: {
-      type: 'mesh-3d',
+      type: "mesh-3d",
       symbolLayers: [
         {
-          type: 'fill',
+          type: "fill",
           material: {
             color: symbolColor,
           },
           outline: { color: symbolColor },
           edges: {
-            type: 'solid',
+            type: "solid",
             color: [50, 50, 50, 0.5],
           },
         },
@@ -381,8 +384,60 @@ const create3dMesh = (
   return [g];
 };
 
+const addChart = () => {
+  Chart.register(...registerables);
+
+  const chartCanvas = document.getElementById(
+    "chart-canvas"
+  ) as HTMLCanvasElement;
+
+  chart = new Chart(chartCanvas, {
+    type: "scatter",
+    data: {
+      datasets: [
+        {
+          label: "Elevation difference by frequency",
+          data: [],
+        },
+      ],
+    },
+    options: {
+      scales: {
+        x: {
+          type: "linear",
+          position: "bottom",
+        },
+      },
+    },
+  });
+}
+
+const updateChart = (pixels: number[][]) => {
+
+  console.log("pixels", pixels)
+
+  // set default chart font color to white
+  Chart.defaults.color = "#fff";
+
+  const elevationDiff = pixels[0].map((pxVal: number, i: number) => Math.round(pixels[1][i]) - Math.round(pxVal))
+  const elevationCounts = elevationDiff.reduce((prev: any, curr: number) => {
+    prev[curr] = prev[curr] === undefined ? 1 : prev[curr] += 1;
+    return prev;
+  }, {});
+  const elevationStats = Object.keys(elevationCounts).map((key: string) => {
+    return {
+      x: parseInt(key),
+      y: elevationCounts[key]
+    } 
+  })
+
+  chart.data.datasets[0].data = elevationStats;
+  chart.update();
+};
+
 const initApp = () => {
   console.log("View 's ready. Continue imperatively from here.", view);
   setupView();
   addLayers();
+  addChart();
 };
