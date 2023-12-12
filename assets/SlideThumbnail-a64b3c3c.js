@@ -1,0 +1,1 @@
+import{a5 as t,a6 as s,a9 as o,ae as a}from"./index-b516d057.js";var e;let r=e=class extends a{constructor(){super(...arguments),this.url=""}destroy(){this.url=""}clone(){return new e({url:this.url})}};t([s({type:String,json:{write:{isRequired:!0}}})],r.prototype,"url",void 0),r=e=t([o("esri.webdoc.support.SlideThumbnail")],r);export{r as p};

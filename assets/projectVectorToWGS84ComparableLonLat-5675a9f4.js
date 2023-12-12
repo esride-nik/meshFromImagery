@@ -1,0 +1,1 @@
+import{f$ as s,aW as u}from"./index-b516d057.js";function f(l,r,n){if(r==null)return!1;const o=s(r);return o!=null&&(o(l,0,t,0),n!==t&&(n[0]=t[0],n[1]=t[1],n.length>2&&(n[2]=t[2])),!0)}const t=u();export{f as o};

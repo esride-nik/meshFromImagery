@@ -1,0 +1,1 @@
+import{B as u,cF as a,aW as o}from"./index-b516d057.js";function c(t,r,e){if(r==null||e==null)return null;const n=new u({spatialReference:e});return a(t,r,0,l,e,0,1)?(n.x=l[0],n.y=l[1],n.z=l[2],n):null}const l=o();export{c as t};

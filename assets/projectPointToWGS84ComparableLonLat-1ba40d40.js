@@ -1,0 +1,1 @@
+import{aW as o}from"./index-b516d057.js";import{o as c}from"./projectVectorToWGS84ComparableLonLat-5675a9f4.js";function f(t,n){r[0]=t.x,r[1]=t.y;const e=t.z;return r[2]=e!==void 0?e:0,c(r,t.spatialReference,n)}const r=o();export{f as t};

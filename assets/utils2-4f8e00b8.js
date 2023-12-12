@@ -1,0 +1,5 @@
+import{z as r}from"./jsxFactory-92036771.js";/*!
+ * All material copyright ESRI, All Rights Reserved, unless otherwise specified.
+ * See https://github.com/Esri/calcite-design-system/blob/main/LICENSE.md for details.
+ * v1.10.0
+ */const i="CALCITE-COMBOBOX-ITEM",a="CALCITE-COMBOBOX-ITEM-GROUP",c=`${i}, ${a}`,m={listContainer:"list-container"};function C(e){var n,s;const t=(n=e.parentElement)==null?void 0:n.closest(c),o=(s=t==null?void 0:t.parentElement)==null?void 0:s.closest(c);return[t,o].filter(l=>l)}function b(e){var t;return((t=e.ancestors)==null?void 0:t.filter(o=>o.nodeName==="CALCITE-COMBOBOX-ITEM"))||[]}function O(e){return r(e.querySelectorAll("calcite-combobox-item"))}function E(e){return r(e.querySelectorAll("calcite-combobox-item")).filter(o=>o.selected).length>0}function f(e){return document.evaluate("ancestor::calcite-combobox-item | ancestor::calcite-combobox-item-group",e,null,XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE,null).snapshotLength}function g(e){return e.includes("single")}export{c as C,O as a,i as b,a as c,m as d,C as e,f,b as g,E as h,g as i};
