@@ -413,9 +413,6 @@ const addChart = () => {
 }
 
 const updateChart = (pixels: number[][]) => {
-
-  console.log("pixels", pixels)
-
   // set default chart font color to white
   Chart.defaults.color = "#fff";
 
@@ -436,7 +433,6 @@ const updateChart = (pixels: number[][]) => {
 };
 
 const initApp = () => {
-  console.log("View 's ready. Continue imperatively from here.", view);
   setupView();
   addLayers();
   addChart();
