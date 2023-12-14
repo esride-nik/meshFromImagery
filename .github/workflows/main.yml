@@ -15,6 +15,13 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
+      - name: Replace string in file
+        uses: MathieuSoysal/replace-string-in-file@v1.0.0
+        with:
+          file: ./index.html
+          old-string: ="\/assets
+          new-string: ="\/meshFromImagery\/assets
+
       - name: Setup Node
         uses: actions/setup-node@v3
 
@@ -49,13 +56,6 @@ jobs:
         with:
           name: production-files
           path: ./dist
-
-      - name: Replace string in file
-        uses: MathieuSoysal/replace-string-in-file@v1.0.0
-        with:
-          file: ./dist/index.html
-          old-string: ="\/assets
-          new-string: ="\/meshFromImagery\/assets
 
       - name: Setup Pages
         uses: actions/configure-pages@v3
