@@ -24,21 +24,10 @@ jobs:
       - name: Build project
         run: npm run build
 
-      - name: Upload production-ready build files
-        uses: actions/upload-artifact@v3
-        with:
-          name: production-files
-          path: ./dist
-
-  exchange-paths:
-    name: Exchange paths
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download build
-        uses: actions/download-artifact@v3
-        with:
-          name: production-files
+      - name: List files in the repository before
+        id: dir_list1
+        run: |
+          ls ${{ github.workspace }}
         
       - name: Replace string in file
         uses: MathieuSoysal/replace-string-in-file@v1.0.0
@@ -47,7 +36,12 @@ jobs:
           old-string: ="\/assets
           new-string: ="\/meshFromImagery\/assets
 
-      - name: Upload build with exchanged paths
+      - name: List files in the repository after
+        id: dir_list2
+        run: |
+          ls ${{ github.workspace }}
+  
+      - name: Upload production-ready build files
         uses: actions/upload-artifact@v3
         with:
           name: production-files
@@ -55,7 +49,7 @@ jobs:
 
   deploy:
     name: Deploy
-    needs: exchange-paths
+    needs: build
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
