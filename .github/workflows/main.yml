@@ -15,12 +15,6 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Setup Node
-        uses: actions/setup-node@v3
-
-      - name: Install dependencies
-        uses: bahmutov/npm-install@v1
-
       - name: List files in the repository before
         id: dir_list1
         run: |
@@ -33,10 +27,16 @@ jobs:
           old-string: ="\/assets
           new-string: ="\/meshFromImagery\/assets
 
-      - name: List files in the repository after
-        id: dir_list2
+      - name: cat index.html
+        id: catindex
         run: |
-          ls ${{ github.workspace }}
+          cat index.html
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+
+      - name: Install dependencies
+        uses: bahmutov/npm-install@v1
 
       - name: Build project
         run: npm run build
