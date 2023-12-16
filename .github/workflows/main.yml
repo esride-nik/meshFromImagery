@@ -7,6 +7,19 @@ on:
       - github-action
 
 jobs:
+  test-action:
+    runs-on: ubuntu-latest
+    name: A job to say hello
+    steps:
+      - name: Hello world action step
+        id: hello
+        uses: esride-nik/action_replaceString@v0.1
+        with:
+          who-to-greet: 'Mona the Octocat'
+      # Use the output from the `hello` step
+      - name: Get the output time
+        run: echo "The time was ${{ steps.hello.outputs.time }}"
+
   build:
     name: Build
     runs-on: ubuntu-latest
@@ -26,11 +39,6 @@ jobs:
           file: ./index.html
           old-string: ="\/assets
           new-string: ="\/meshFromImagery\/assets
-
-      - name: cat index.html
-        id: catindex
-        run: |
-          cat index.html
 
       - name: Setup Node
         uses: actions/setup-node@v3
